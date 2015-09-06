@@ -36,7 +36,7 @@ def writeDone(s):
         myfile.write("%s\n" % (s))
 
 ##
-## procedure forming the page
+## procedure producing the page
 ##
 def producePage(word,form):
   # -----
@@ -88,24 +88,27 @@ def producePage(word,form):
   raise Exception('Unknown word form: %s' % (form))
 
 ##
-## iterate
+## MAIN: iterate
 ##
 for pageDescr in todo:
   if not pageDescr in done:
     try:
+      # parse the record
       pageRec = pageDescr.split('|')
       wordStr = pageRec[0]
       wordForm = pageRec[1]
       wordFormKind = pageRec[2]
-      #print("=====> NEW PAGE (word=%s form=%s(%s))=>>>%s<<<" % (wordStr,wordForm,wordFormKind,producePage(wordStr, wordFormKind)))
+      # read page, see if it exists
       page = pywikibot.Page(site, wordForm)
       if page.exists():
-        log("page %s (%s) of word=%s already exists - not touching it" % (wordForm,wordFormKind,wordStr))
+        log("page %s (%s) for verb=%s already exists - not touching it" % (wordForm,wordFormKind,wordStr))
         continue
+      # write the page
       log("writing page %s (%s) of word=%s ..." % (wordForm,wordFormKind,wordStr))
       page.text = producePage(wordStr, wordFormKind)
       page.save('creating %s of %s (test run)' % (wordFormKind,wordStr))  # Saves the page
-      log("... done writing page %s (%s) of word=%s" % (wordForm,wordFormKind,wordStr))
+      log("... done writing page %s (%s) for verb=%s" % (wordForm,wordFormKind,wordStr))
+      # done
       writeDone(pageDescr)
     except Exception as exc:
       log("caught an exception: %s" % (exc))
